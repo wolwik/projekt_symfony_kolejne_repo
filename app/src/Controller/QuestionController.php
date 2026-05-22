@@ -2,43 +2,44 @@
 
 namespace App\Controller;
 
+use App\Entity\Question;
 use App\Repository\QuestionRepository;
+use App\Service\QuestionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 final class QuestionController extends AbstractController {
+
+    public function __construct(
+        private readonly QuestionService $questionService
+    ) {}
+
+
     #[Route(
         '/question',
-        name: 'question_list'
+        name: 'question_list',
+        methods: ['GET']
     )]
 
     /*
-     * IndexT
+     * Index
      */
-    public function index(Request $request, QuestionRepository $questionRepository, PaginatorInterface $paginator, #[MapQueryParameter] int $page = 1): Response {
-        $pagination = $paginator->paginate(
-            $questionRepository->queryAll(),
-            $page,
-            QuestionRepository::PAGINATOR_ITEMS_PER_PAGE,
-            [
-                'sortFieldAllowList' => ['question.createdAt', 'question.title', 'question.category'], // lista rzeczy,
-                // po ktorych bedzie mozna sortowac
-                'defaultSortFieldName' => 'question.createdAt', // domyslne sortowanie
-                'defaultSortDirection' => 'desc', // kierunek sortowania, descending
-            ]
-        );
+    public function index(#[MapQueryParameter] int $page = 1): Response {
+        $pagination = $this->questionService->getPaginatedList($page);
         return $this->render('question/index.html.twig', [
             'pagination' => $pagination,
         ]);
     }
 
-
-    /*
-     * View
+    /**
+     * View action.
+     *
+     * @param Question $question Question entity
+     *
+     * @return Response HTTP response
      */
     #[Route(
         '/question/{id}',
@@ -47,10 +48,8 @@ final class QuestionController extends AbstractController {
         methods: ['GET']
     )]
 
-    public function view(QuestionRepository $questionRepository, int $id): Response {
-        $question = $questionRepository->find($id);
-        if (null === $question) throw $this->createNotFoundException('Question not found');
-        return $this->render('question/view.html.twig', ['id' => $id, 'question' => $question]);
+    public function view(Question $question): Response {
+        return $this->render('question/view.html.twig', ['question' => $question]);
     }
 
 }

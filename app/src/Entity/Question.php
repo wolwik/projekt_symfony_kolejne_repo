@@ -31,7 +31,7 @@ class Question {
     #[ORM\Column(nullable: true)]
     private ?\DateTime $updatedAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'question', targetEntity: Answer::class)]
+    #[ORM\OneToMany(mappedBy: 'question', targetEntity: Answer::class, fetch: 'EXTRA_LAZY')]
     private Collection $answers;
 
     #[ORM\ManyToOne(targetEntity: Category::class)]
