@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello QuestionController!{% endblock %}
+
+{% block body %}
+
+    <h1>{{ 'label.question_list'|trans }}</h1>
+
+    {% if pagination is defined and pagination.items|length %}
+
+    <div class="navigation text-center">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>{{ knp_pagination_sortable(pagination, 'label.title'|trans, 'question.createdAt') }}</th>
+                <th>{{ knp_pagination_sortable(pagination, 'label.created_at'|trans, 'question.createdAt') }}</th>
+                <th>{{ 'label.category'|trans }}</th>
+                <th>{{ 'label.content'|trans }}</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for question in pagination.items %}
+                <tr>
+                    <td>{{ question.title }}</td>
+                    <td>{{ question.createdAt|date('Y-m-d H:i') }}</td>
+                    <td>{{ question.category.name }}</td>
+                    <td>{{ question.content }}</td>
+                    <td><a href="{{ url('question_view', {id: question.id}) }}">Link</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="navigation text-center">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+    {% else %}
+        <p>
+            {{ 'message.empty_list'|trans }}
+        </p>
+    {% endif %}
+{% endblock %}
+
