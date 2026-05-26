@@ -6,6 +6,7 @@
 
 namespace App\Service;
 
+use App\Entity\Question;
 use App\Repository\QuestionRepository;
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -35,5 +36,16 @@ class QuestionService {
             ]
         );
     }
+    public function save(Question $question): void
+    {
+        $question->setUpdatedAt(new \DateTime);
+        if (null === $question->getId()) {
+            $question->setCreatedAt(new \DateTime);
+        }
+        $this->questionRepository->save($question);
+    }
+
+
+
 
 }

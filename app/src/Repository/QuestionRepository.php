@@ -9,19 +9,11 @@ use Doctrine\Persistence\ManagerRegistry;
 
 
 /**
+ * Class CategoryRepository.
+ *
  * @extends ServiceEntityRepository<Question>
  */
 class QuestionRepository extends ServiceEntityRepository {
-    /**
-     * Items per page.
-     *
-     * Use constants to define configuration options that rarely change instead
-     * of specifying them in configuration files.
-     * See https://symfony.com/doc/current/best_practices.html#configuration
-     *
-     * @var int
-     */
-    public const PAGINATOR_ITEMS_PER_PAGE = 5;
 
     /**
      * Constructor.
@@ -41,7 +33,16 @@ class QuestionRepository extends ServiceEntityRepository {
         return $this->createQueryBuilder('question');
     }
 
-
+    /**
+     * Save entity.
+     *
+     * @param Question $question Question entity
+     */
+    public function save(Question $question): void
+    {
+        $this->getEntityManager()->persist($question);
+        $this->getEntityManager()->flush();
+    }
 
     //    /**
     //     * @return Question[] Returns an array of Question objects
