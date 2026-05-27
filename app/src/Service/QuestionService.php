@@ -45,6 +45,11 @@ class QuestionService {
         $this->questionRepository->save($question);
     }
 
+    public function delete(Question $question): void
+    {
+        $this->questionRepository->delete($question);
+    }
+
 
 
 

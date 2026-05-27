@@ -3,20 +3,31 @@
 namespace App\Controller;
 
 use App\Entity\Question;
+use App\Form\Type\QuestionDeleteType;
 use App\Form\Type\QuestionType;
 use App\Repository\QuestionRepository;
 use App\Service\QuestionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class QuestionController extends AbstractController {
 
+    /**
+     * Constructor.
+     *
+     * @param QuestionServiceInterface $questionService Question service
+     * @param TranslatorInterface      $translator      Translator
+     */
     public function __construct(
-        private readonly QuestionService $questionService
+        private readonly QuestionService $questionService,
+        private readonly TranslatorInterface $translator
     ) {}
 
 
@@ -76,7 +87,13 @@ final class QuestionController extends AbstractController {
         if ($form->isSubmitted() && $form->isValid()) {
             $this->questionService->save($question);
 
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.created_successfully')
+            );
+
             return $this->redirectToRoute('question_list');
+
         }
 
         return $this->render('question/create.html.twig', [
@@ -84,5 +101,92 @@ final class QuestionController extends AbstractController {
         ]);
     }
 
+    /**
+     * Edit action.
+     *
+     * @param Request  $request  HTTP request
+     * @param Question $question Question entity
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/{id}/edit',
+        name: 'question_edit',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET', 'PUT']
+    )]
+    public function edit(Request $request, Question $question): Response
+    {
+        $form = $this->createForm(
+            QuestionType::class,
+            $question,
+            [
+                'method' => 'PUT',
+                'action' => $this->generateUrl('question_edit', ['id' => $question->getId()]),
+            ]
+        );
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->questionService->save($question);
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.edited_successfully')
+            );
+
+            return $this->redirectToRoute('question_view', ['id' => $question->getId()]);
+
+        }
+
+        return $this->render(
+            'question/edit.html.twig',
+            [
+                'form' => $form->createView(),
+                'question' => $question,
+            ]
+        );
+    }
+
+    /**
+     * Delete action.
+     *
+     * @param Request  $request  HTTP request
+     * @param Question $question Question entity
+     *
+     * @return Response HTTP response
+     */
+    #[Route(
+        '/{id}/delete',
+        name: 'question_delete',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET', 'POST', 'DELETE']
+    )]
+    public function delete(Request $request, Question $question): Response
+    {
+        $form = $this->createForm(QuestionDeleteType::class, null, [
+            'action' => $this->generateUrl('question_delete', [
+                'id' => $question->getId()
+            ]),
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->questionService->delete($question);
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.deleted_successfully')
+            );
+
+            return $this->redirectToRoute('question_list');
+        }
+
+        return $this->render('question/delete.html.twig', [
+            'form' => $form->createView(),
+            'question' => $question,
+        ]);
+    }
 }
 
