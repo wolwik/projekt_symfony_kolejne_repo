@@ -12,6 +12,41 @@
             <p>{{ question.content }}</p>
             <a href="{{ url('question_list') }}">Back</a>
         </div>
+
+        <div>
+        <h3>Odpowiedzi</h3>
+
+        {% if question.answers is empty %}
+            <p>Brak odpowiedzi</p>
+        {% else %}
+            {% for answer in question.answers %}
+                <div>
+                    <p>{{ answer.guestEmail }}</p>
+                    <p>{{ answer.createdAt|date('Y-m-d H:i') }}</p>
+                    <p>{{ answer.content }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+        </div>
+
+        <!--FORMULARZ DLA ODPOWIEDZI-->
+        <div>
+            {{ form_start(answerForm, {
+                action: path('answer_create', {id: question.id}),
+                method: 'POST'
+            }) }}
+
+            {{ form_widget(answerForm) }}
+
+            <button type="submit">
+                Dodaj odpowiedz
+            </button>
+
+            {{ form_end(answerForm) }}
+        </div>
+
+
+
     {% else %}
         <p>
             {{ 'message.record_not_found'|trans }}

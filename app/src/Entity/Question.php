@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\QuestionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 
@@ -38,11 +39,17 @@ class Question {
         cascade: ['remove'],
         orphanRemoval: true)
     ]
+    #[ORM\OrderBy(['createdAt' => 'DESC'])]
     private Collection $answers;
 
     #[ORM\ManyToOne(targetEntity: Category::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
+
+    public function __construct()
+    {
+        $this->answers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -114,5 +121,10 @@ class Question {
         $this->category = $category;
 
         return $this;
+    }
+
+    public function getAnswers(): Collection
+    {
+        return $this->answers;
     }
 }

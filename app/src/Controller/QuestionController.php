@@ -3,17 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Question;
-use App\Form\Type\QuestionDeleteType;
-use App\Form\Type\QuestionType;
-use App\Repository\QuestionRepository;
+use App\Form\AnswerType;
+use App\Form\QuestionDeleteType;
+use App\Form\QuestionType;
 use App\Service\QuestionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -47,6 +44,9 @@ final class QuestionController extends AbstractController {
         ]);
     }
 
+
+
+
     /**
      * View action.
      *
@@ -54,6 +54,7 @@ final class QuestionController extends AbstractController {
      *
      * @return Response HTTP response
      */
+
     #[Route(
         '/question/{id}',
         name: 'question_view',
@@ -62,8 +63,18 @@ final class QuestionController extends AbstractController {
     )]
 
     public function view(Question $question): Response {
-        return $this->render('question/view.html.twig', ['question' => $question]);
+
+        // tworzymy zmienną z formularza dla Answer
+        $form = $this->createForm(AnswerType::class);
+
+        return $this->render('question/view.html.twig', [
+            'question' => $question,
+            'answerForm' => $form->createView(),
+        ]);
     }
+
+
+
 
     /**
      * Create action.
@@ -72,6 +83,7 @@ final class QuestionController extends AbstractController {
      *
      * @return Response HTTP response
      */
+
     #[Route(
         '/create',
         name: 'question_create',
@@ -85,6 +97,7 @@ final class QuestionController extends AbstractController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             $this->questionService->save($question);
 
             $this->addFlash(
@@ -101,6 +114,9 @@ final class QuestionController extends AbstractController {
         ]);
     }
 
+
+
+
     /**
      * Edit action.
      *
@@ -109,6 +125,7 @@ final class QuestionController extends AbstractController {
      *
      * @return Response HTTP response
      */
+
     #[Route(
         '/{id}/edit',
         name: 'question_edit',
@@ -148,6 +165,9 @@ final class QuestionController extends AbstractController {
         );
     }
 
+
+
+
     /**
      * Delete action.
      *
@@ -156,6 +176,7 @@ final class QuestionController extends AbstractController {
      *
      * @return Response HTTP response
      */
+
     #[Route(
         '/{id}/delete',
         name: 'question_delete',

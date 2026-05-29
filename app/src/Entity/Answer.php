@@ -102,7 +102,6 @@ class Answer {
     public function setQuestion(?Question $question): static
     {
         $this->question = $question;
-
         return $this;
     }
 }

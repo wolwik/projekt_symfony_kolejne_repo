@@ -16,7 +16,6 @@ use Knp\Component\Pager\PaginatorInterface;
  */
 
 class QuestionService {
-
     private const PAGINATOR_ITEMS_PER_PAGE = 10;
     public function __construct(
         private readonly QuestionRepository $questionRepository,
