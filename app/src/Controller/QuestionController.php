@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Question;
 use App\Form\AnswerType;
-use App\Form\QuestionDeleteType;
+use App\Form\DeleteType;
 use App\Form\QuestionType;
 use App\Service\QuestionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,22 +28,23 @@ final class QuestionController extends AbstractController {
     ) {}
 
 
+
+    /**
+     * Index.
+     */
+
     #[Route(
         '/question',
         name: 'question_list',
         methods: ['GET']
     )]
 
-    /*
-     * Index
-     */
     public function index(#[MapQueryParameter] int $page = 1): Response {
         $pagination = $this->questionService->getPaginatedList($page);
         return $this->render('question/index.html.twig', [
             'pagination' => $pagination,
         ]);
     }
-
 
 
 
@@ -72,7 +73,6 @@ final class QuestionController extends AbstractController {
             'answerForm' => $form->createView(),
         ]);
     }
-
 
 
 
@@ -116,7 +116,6 @@ final class QuestionController extends AbstractController {
 
 
 
-
     /**
      * Edit action.
      *
@@ -132,6 +131,7 @@ final class QuestionController extends AbstractController {
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'PUT']
     )]
+
     public function edit(Request $request, Question $question): Response
     {
         $form = $this->createForm(
@@ -178,14 +178,14 @@ final class QuestionController extends AbstractController {
      */
 
     #[Route(
-        '/{id}/delete',
+        'question/{id}/delete',
         name: 'question_delete',
         requirements: ['id' => '[1-9]\d*'],
         methods: ['GET', 'POST', 'DELETE']
     )]
     public function delete(Request $request, Question $question): Response
     {
-        $form = $this->createForm(QuestionDeleteType::class, null, [
+        $form = $this->createForm(DeleteType::class, null, [
             'action' => $this->generateUrl('question_delete', [
                 'id' => $question->getId()
             ]),

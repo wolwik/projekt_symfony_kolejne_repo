@@ -13,7 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @extends ServiceEntityRepository<Question>
  */
-class QuestionRepository extends ServiceEntityRepository {
+class QuestionRepository extends ServiceEntityRepository
+{
 
     /**
      * Constructor.

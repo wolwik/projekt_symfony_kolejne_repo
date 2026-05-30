@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Answer;
 use App\Entity\Question;
 use App\Form\AnswerType;
+use App\Form\DeleteType;
 use App\Service\AnswerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,9 +19,6 @@ final class AnswerController extends AbstractController
 
     /**
      * Constructor.
-     *
-     * @param AnswerServiceInterface $answerService Answer service
-     * @param TranslatorInterface      $translator      Translator
      */
 
     public function __construct(
@@ -30,6 +28,9 @@ final class AnswerController extends AbstractController
 
 
 
+    /**
+     * Index.
+     */
 
     #[Route(
         '/answer',
@@ -42,6 +43,12 @@ final class AnswerController extends AbstractController
             'controller_name' => 'AnswerController',
         ]);
     }
+
+
+
+    /**
+     * Create action.
+     */
 
     #[Route(
         '/question/{id}/answer',
@@ -60,12 +67,10 @@ final class AnswerController extends AbstractController
 
             $this->answerService->save($answer, $question);
 
-            /* to ma być tutaj ??
             $this->addFlash(
                 'success',
                 $this->translator->trans('message.created_successfully')
             );
-            */
 
         }
 
@@ -74,5 +79,85 @@ final class AnswerController extends AbstractController
     }
 
     // nie renderujemy twiga, bo to jest w twigu renderowanym przez Question
+
+
+
+    /**
+     * Edit action.
+     */
+
+    #[Route(
+        'answer/{id}/edit',
+        name: 'answer_edit',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET', 'PUT']
+    )]
+
+    public function edit(Request $request, Answer $answer): Response
+    {
+        $form = $this->createForm(
+            AnswerType::class,
+            $answer, [
+                'method' => 'PUT',
+                'action' => $this->generateUrl('answer_edit', ['id' => $answer->getId()]),
+            ]
+        );
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->answerService->save($answer, $answer->getQuestion());
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.edited_successfully')
+            );
+
+            return $this->redirectToRoute('question_view', ['id' => $answer->getQuestion()->getId()]); // pobranie id pytania
+        }
+
+        return $this->render('answer/edit.html.twig', [
+            'form' => $form->createView(),
+            'answer' => $answer,
+        ]);
+    }
+
+
+    /**
+     * Delete action.
+     */
+
+    #[Route(
+        'answer/{id}/delete',
+        name: 'answer_delete',
+        requirements: ['id' => '[1-9]\d*'],
+        methods: ['GET', 'POST', 'DELETE']
+    )]
+
+    public function delete(Request $request, Answer $answer): Response
+    {
+        $form = $this->createForm(DeleteType::class, null, [
+            'action' => $this->generateUrl('answer_delete', [
+                'id' => $answer->getId()
+            ]),
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->answerService->delete($answer);
+
+            $this->addFlash(
+                'success',
+                $this->translator->trans('message.deleted_successfully')
+            );
+
+            return $this->redirectToRoute('question_view', ['id' => $answer->getQuestion()->getId()]);
+        }
+
+        return $this->render('question/delete.html.twig', [
+            'form' => $form->createView(),
+            'question' => $answer,
+        ]);
+    }
 
 }

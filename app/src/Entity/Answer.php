@@ -30,9 +30,13 @@ class Answer {
     #[ORM\Column]
     private ?\DateTime $createdAt = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $updatedAt = null;
+
     #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: "answers")]
     #[ORM\JoinColumn(nullable: false)]
     private ?Question $question = null;
+
 
     public function getId(): ?int
     {
@@ -102,6 +106,18 @@ class Answer {
     public function setQuestion(?Question $question): static
     {
         $this->question = $question;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
         return $this;
     }
 }

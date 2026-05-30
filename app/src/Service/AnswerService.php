@@ -15,7 +15,8 @@ class AnswerService {
         private readonly AnswerRepository $answerRepository
     ) {}
 
-    public function save(Answer $answer, Question $question): void
+    public function save(Answer $answer, ?Question $question = null): void
+    // par Question jest opcjonalny (ta metoda jest też uzywana do edytowania pytania)
     {
         if (null === $answer->getId()) {
             $answer->setCreatedAt(new \DateTime);
@@ -25,8 +26,16 @@ class AnswerService {
             $answer->setQuestion($question);
             $answer->setGuestNickname('ANDRZEJ');
             $answer->setGuestEmail('sss@gmail.com');
+        } else {
+            $answer->setUpdatedAt(new \DateTime); // jeżeli nie null to update
         }
+
         $this->answerRepository->save($answer);
+    }
+
+    public function delete(Answer $answer): void
+    {
+        $this->answerRepository->delete($answer);
     }
 }
 

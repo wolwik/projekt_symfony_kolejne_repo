@@ -23,13 +23,22 @@
                 <div>
                     <p>{{ answer.guestEmail }}</p>
                     <p>{{ answer.createdAt|date('Y-m-d H:i') }}</p>
+                    {%  if answer.updatedAt !== null %}
+                        <p>Ostatnia edycja: {{ answer.updatedAt|date('Y-m-d H:i') }}</p>
+                    {% endif %}
                     <p>{{ answer.content }}</p>
+                    <a href="{{ path('answer_edit', {id: answer.id}) }}">
+                        Edytuj
+                    </a>
+                    <a href="{{ path('answer_delete', {id: answer.id}) }}">
+                        Usuń
+                    </a>
                 </div>
             {% endfor %}
         {% endif %}
         </div>
 
-        <!--FORMULARZ DLA ODPOWIEDZI-->
+        <!--FORMULARZ DODAWANIA ODPOWIEDZI-->
         <div>
             {{ form_start(answerForm, {
                 action: path('answer_create', {id: question.id}),
